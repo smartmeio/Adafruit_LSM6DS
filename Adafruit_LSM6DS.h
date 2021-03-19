@@ -29,14 +29,18 @@
 #define LSM6DS_CTRL1_XL 0x10       ///< Main accelerometer config register
 #define LSM6DS_CTRL2_G 0x11        ///< Main gyro config register
 #define LSM6DS_CTRL3_C 0x12        ///< Main configuration register
+#define LSM6DS_CTRL6_C 0x15        ///< Angular rate sensor control register
+#define LSM6DS_CTRL7_G 0x16        ///< Angular rate sensor control register
 #define LSM6DS_CTRL8_XL 0x17       ///< High and low pass for accel
 #define LSM6DS_CTRL10_C 0x19       ///< Main configuration register
 #define LSM6DS_WAKEUP_SRC 0x1B     ///< Why we woke up
+#define LSM6DS_STATUS_REG 0x1E     ///< status register
 #define LSM6DS_OUT_TEMP_L 0x20     ///< First data register (temperature low)
 #define LSM6DS_OUTX_L_G 0x22       ///< First gyro data register
 #define LSM6DS_OUTX_L_A 0x28       ///< First accel data register
 #define LSM6DS_STEPCOUNTER 0x4B    ///< 16-bit step counter
 #define LSM6DS_TAP_CFG 0x58        ///< Tap/pedometer configuration
+#define LSM6DS_TAP_THS_6D 0x59     ///< Tap 6d threshold
 #define LSM6DS_WAKEUP_THS                                                      \
   0x5B ///< Single and double-tap function threshold register
 #define LSM6DS_WAKEUP_DUR                                                      \
@@ -83,6 +87,13 @@ typedef enum hpf_range {
   LSM6DS_HPF_ODR_DIV_9 = 2,
   LSM6DS_HPF_ODR_DIV_400 = 3,
 } lsm6ds_hp_filter_t;
+
+typedef enum sixdThs_e {
+  LSM6D_SIXD_THS_80 = 0,
+  LSM6D_SIXD_THS_70 = 1,
+  LSM6D_SIXD_THS_60 = 2,
+  LSM6D_SIXD_THS_50 = 3,
+}sixdThs_t;
 
 class Adafruit_LSM6DS;
 
@@ -168,6 +179,7 @@ public:
                   bool step_detect = false, bool wakeup = false);
   void configInt2(bool drdy_temp, bool drdy_g, bool drdy_xl);
   void highPassFilter(bool enabled, lsm6ds_hp_filter_t filter);
+  void configInt1_6d(bool _6dint);
 
   void enableWakeup(bool enable, uint8_t duration, uint8_t thresh);
   bool awake(void);
@@ -186,6 +198,9 @@ public:
   Adafruit_Sensor *getTemperatureSensor(void);
   Adafruit_Sensor *getAccelerometerSensor(void);
   Adafruit_Sensor *getGyroSensor(void);
+
+  uint16_t readTap6d(void);
+  uint8_t getStatusReg(void);
 
 protected:
   float temperature, ///< Last reading's temperature (C)

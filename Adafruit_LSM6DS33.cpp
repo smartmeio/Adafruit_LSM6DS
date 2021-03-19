@@ -32,8 +32,8 @@ bool Adafruit_LSM6DS33::_init(int32_t sensor_id) {
   }
 
   // enable accelerometer and gyro by setting the data rate to non-zero
-  setAccelDataRate(LSM6DS_RATE_104_HZ);
-  setGyroDataRate(LSM6DS_RATE_104_HZ);
+  setAccelDataRate(LSM6DS_RATE_416_HZ);
+  setGyroDataRate(LSM6DS_RATE_416_HZ);
 
   delay(10);
 

@@ -162,11 +162,15 @@ void Adafruit_LSM6DS::reset(void) {
 
   Adafruit_BusIO_RegisterBits boot = Adafruit_BusIO_RegisterBits(&ctrl3, 1, 7);
 
+  Adafruit_BusIO_RegisterBits bdu = Adafruit_BusIO_RegisterBits(&ctrl3, 1, 6);
+
   sw_reset.write(true);
 
   while (sw_reset.read()) {
     delay(1);
   }
+
+  bdu.write(true);
 }
 
 /*!
@@ -506,6 +510,17 @@ void Adafruit_LSM6DS::configInt1(bool drdy_temp, bool drdy_g, bool drdy_xl,
   wu.write(wakeup);
 }
 
+void Adafruit_LSM6DS::configInt1_6d(bool _6dint) {
+
+  Adafruit_BusIO_Register md1cfg = Adafruit_BusIO_Register(
+      i2c_dev, spi_dev, ADDRBIT8_HIGH_TOREAD, LSM6DS_MD1_CFG);
+
+  Adafruit_BusIO_RegisterBits _6d = Adafruit_BusIO_RegisterBits(&md1cfg, 1, 2);
+  _6d.write(_6dint);
+}
+
+
+
 /**************************************************************************/
 /*!
     @brief Enables and disables the data ready interrupt on INT 2.
@@ -725,4 +740,24 @@ uint16_t Adafruit_LSM6DS::readPedometer(void) {
   Adafruit_BusIO_Register steps_reg = Adafruit_BusIO_Register(
       i2c_dev, spi_dev, ADDRBIT8_HIGH_TOREAD, LSM6DS_STEPCOUNTER, 2);
   return steps_reg.read();
+}
+
+uint16_t Adafruit_LSM6DS::readTap6d(void) {
+  Adafruit_BusIO_Register tap_ths_reg = Adafruit_BusIO_Register(
+      i2c_dev, spi_dev, ADDRBIT8_HIGH_TOREAD, LSM6DS_TAP_THS_6D);
+
+  Adafruit_BusIO_RegisterBits _6d_ths =
+      Adafruit_BusIO_RegisterBits(&tap_ths_reg, 2, 5);
+  return _6d_ths.read();
+}
+
+uint8_t Adafruit_LSM6DS::getStatusReg(void) {
+
+  Adafruit_BusIO_Register statusReg = Adafruit_BusIO_Register(
+      i2c_dev, spi_dev, ADDRBIT8_HIGH_TOREAD, LSM6DS_STATUS_REG);
+
+  uint8_t status = 0;
+  statusReg.read(&status);
+
+  return status;
 }
